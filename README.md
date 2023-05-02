@@ -41,3 +41,6 @@ Started to scan file 'test1.txt' with pattern '?lya'
 Line: Ilya
 
 Finished scan
+
+# Note
+CFileWrapper could be replaced with another one for required OS for example and project could be run on that OS
