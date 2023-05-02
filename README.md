@@ -2,10 +2,11 @@
 Simple file reader for Windows which extracts lines from the file only which matches the pattern
 
 # Usage
+```
 FileReader.exe <file name> <pattern>
-
+```
 # Example
-
+```
 C:\Users\ilyayandaev\source\repos\FileReader\Debug>FileReader.exe test1.txt *
 Started to scan file 'test1.txt' with pattern '*'
 
@@ -41,6 +42,6 @@ Started to scan file 'test1.txt' with pattern '?lya'
 Line: Ilya
 
 Finished scan
-
+```
 # Note
 CFileWrapper could be replaced with another one for required OS for example and project could be run on that OS
