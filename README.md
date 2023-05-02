@@ -1,10 +1,12 @@
 # FileReader
-Simple file reader for Windows which extracts lines from the file only which matches the pattern.
+```Simple file reader for Windows which extracts lines from the file only which matches the pattern.```
 
 # Supported patterns:
+```
 Supports the following wildcard operators: ?, *
-Note: If you need to use ?, * symbols then you need to escape them using '\\'(for example: *abs\*?)
-
+Note: If you need to use ?, * symbols then you need to escape them using '\\'
+For example: *abs\*?
+```
 # Usage
 ```
 FileReader.exe <file name> <pattern>
@@ -48,4 +50,4 @@ Line: Ilya
 Finished scan
 ```
 # Note
-CFileWrapper could be replaced with another one for required OS for example and project could be run on that OS
+```CFileWrapper could be replaced with another one for required OS for example and project could be run on that OS```
