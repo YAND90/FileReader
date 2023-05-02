@@ -1,5 +1,9 @@
 # FileReader
-Simple file reader for Windows which extracts lines from the file only which matches the pattern
+Simple file reader for Windows which extracts lines from the file only which matches the pattern.
+
+# Supported patterns:
+Supports the following wildcard operators: ?, *
+Note: If you need to use ?, * symbols then you need to escape them using '\\'(for example: *abs\*?)
 
 # Usage
 ```
