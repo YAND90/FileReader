@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="FileWrapper.cpp" />
+    <ClCompile Include="LogReader.cpp" />
+    <ClCompile Include="wildcard.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FileWrapper.h" />
+    <ClInclude Include="LogReader.h" />
+    <ClInclude Include="wildcard.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="files">
+      <UniqueIdentifier>{14df9e45-49b8-4ed3-a22d-fded7043879f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="test1.txt" />
+  </ItemGroup>
+</Project>
