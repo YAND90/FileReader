@@ -10,9 +10,7 @@ C:\Users\ilyayandaev\source\repos\FileReader\Debug>FileReader.exe test1.txt *
 Started to scan file 'test1.txt' with pattern '*'
 
 Line: Hello
-
 Line: World
-
 Line: My
 Line: Name
 Line: Is
