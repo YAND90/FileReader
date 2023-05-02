@@ -38,6 +38,7 @@ bool CLogReader::Close()
 	if (!m_FileWrapper->close()) {
 		return false;
 	}
+    m_FileOpened = false;
 	return true;
 }
 
