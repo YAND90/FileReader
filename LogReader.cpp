@@ -6,16 +6,19 @@
 #include <stdio.h>
 #include <string.h>
 
-CLogReader::CLogReader(CFileWrapper& fileWrapper)
-    : m_Filter("*"), m_FileOffset(0), m_Remain(false), m_RemainLen(0), m_RemainOffset(0), m_Line(new char[LINE_BUFFER_SIZE]), m_LineSize(LINE_BUFFER_SIZE), m_FileOpened(false)
+CLogReader::CLogReader(CFileWrapper& fileWrapper, const unsigned int& readBufferSize)
+    : m_Filter(nullptr), m_FileOffset(0), m_Remain(false), m_RemainLen(0), m_RemainOffset(0), m_FileOpened(false)
 {
+    m_ReadBufferSize = readBufferSize;
+    m_ReaBuffer = new char[m_ReadBufferSize];
 	m_FileWrapper = &fileWrapper;
 }
 
 CLogReader::~CLogReader()
 {
     Close();
-    delete[] m_Line;
+    delete[] m_Filter;
+    delete[] m_ReaBuffer;
 }
 
 bool CLogReader::Open(const char* fileName)
@@ -44,15 +47,22 @@ bool CLogReader::Close()
 
 bool CLogReader::SetFilter(const char* filter)
 {
-	this->m_Filter = filter;
-	return false;
+    unsigned int len = strlen(filter);
+
+    if (this->m_Filter) {
+        delete[] this->m_Filter;
+    }
+
+    this->m_Filter = new char[len + 1];
+    strcpy_s(this->m_Filter, len + 1, filter);
+	return true;
 }
 
-bool CLogReader::GetNextChar(char* buf, const int size, char& c, bool& eof) {
+bool CLogReader::GetNextChar(char& c, bool& eof) {
     while (true) {
         if (m_Remain) {
             if (m_RemainOffset < m_RemainLen) {
-                c = buf[m_RemainOffset];
+                c = m_ReaBuffer[m_RemainOffset];
                 m_RemainOffset++;
                 return true;
             }
@@ -60,7 +70,7 @@ bool CLogReader::GetNextChar(char* buf, const int size, char& c, bool& eof) {
 
         unsigned int bytesRead = 0;
 
-        if (!m_FileWrapper->read(buf, size, bytesRead, m_FileOffset)) {
+        if (!m_FileWrapper->read(m_ReaBuffer, m_ReadBufferSize, bytesRead, m_FileOffset)) {
             unsigned int errorCode = m_FileWrapper->getError();
 
             if (m_FileWrapper->isEOF(errorCode)) {
@@ -92,7 +102,7 @@ bool CLogReader::GetNextLine(char* buf, const int bufSize, bool& found) {
     found = false;
 
     while (true) {
-        if (!GetNextChar(buf, bufSize, c, eof)) {
+        if (!GetNextChar(c, eof)) {
             return false;
         }
 
@@ -104,22 +114,25 @@ bool CLogReader::GetNextLine(char* buf, const int bufSize, bool& found) {
             break;
         }
 
-        ExtendLineBufferIfNeeded(write);
+        if (!CheckBufferBounds(write, bufSize)) {
+            return false;
+        }
 
-        m_Line[write] = c;
+        buf[write] = c;
         ++write;
     }
 
     if (c == '\r') {
-        GetNextChar(buf, bufSize, c, eof);
+        GetNextChar(c, eof);
     }
 
-    ExtendLineBufferIfNeeded(write);
+    if (!CheckBufferBounds(write, bufSize)) {
+        return false;
+    }
 
-    m_Line[write] = '\0';
+    buf[write] = '\0';
 
-    if (wildcard::match(m_Line, m_Filter)) {
-        printf("Line: %s \n", m_Line);
+    if (write > 0 && wildcard::match(buf, m_Filter)) {
         found = true;
     }
 
@@ -132,10 +145,23 @@ bool CLogReader::GetNextLine(char* buf, const int bufSize, bool& found) {
 
 bool CLogReader::GetNextLine(char* buf, const int bufSize)
 {
+    if (!m_Filter) {
+        printf("Filter was not set for reading\n");
+        return false;
+    }
+
+    if (!m_FileOpened) {
+        printf("File was not set for reading\n");
+        return false;
+    }
+
     bool found = false;
     bool res = false;
     while (!found) {
         if (!GetNextLine(buf, bufSize, found)) {
+            if (found) {
+                return true;
+            }
             return false;
         }
     }
@@ -143,12 +169,11 @@ bool CLogReader::GetNextLine(char* buf, const int bufSize)
     return true;
 }
 
-void CLogReader::ExtendLineBufferIfNeeded(const unsigned int write) {
-    if (write + 1 > m_LineSize) {
-        char* tmp = new char[m_LineSize + LINE_BUFFER_SIZE];
-        memcpy(tmp, m_Line, m_LineSize);
-        m_LineSize += LINE_BUFFER_SIZE;
-        delete[] m_Line;
-        m_Line = tmp;
+bool CLogReader::CheckBufferBounds(const unsigned int write, const unsigned int bufSize) {
+    if (write + 1 > bufSize) {
+        printf("Input buffer to short for returning the line. Line size is greater then %d bytes", bufSize);
+        return false;
     }
+
+    return true;
 }

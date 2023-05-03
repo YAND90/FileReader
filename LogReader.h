@@ -6,7 +6,7 @@ class CFileWrapper;
 class CLogReader
 {
 public:
-	CLogReader(CFileWrapper& fileWrapper);
+	CLogReader(CFileWrapper& fileWrapper, const unsigned int& readBufferSize);
 	~CLogReader();
 
 	/*
@@ -27,25 +27,23 @@ public:
 	bool GetNextLine(char* buf, const int bufSize);
 
 private:
-	static const int LINE_BUFFER_SIZE = 1024;
-
-	bool GetNextChar(char* buf, const int size, char& c, bool& eof);
-	void ExtendLineBufferIfNeeded(const unsigned int write);
+	bool GetNextChar(char& c, bool& eof);
+	bool CheckBufferBounds(const unsigned int write, const unsigned int bufSize);
 	bool GetNextLine(char* buf, const int bufSize, bool& found);
 
 	CFileWrapper* m_FileWrapper;
 	unsigned int m_FileOffset;
 
-	const char* m_Filter;
+	char* m_Filter;
 
 	bool m_Remain;
 	unsigned int m_RemainOffset;
 	unsigned int m_RemainLen;
 
-	char* m_Line;
-	unsigned int m_LineSize;
-
 	bool m_FileOpened;
+
+	char* m_ReaBuffer;
+	unsigned int m_ReadBufferSize;
 };
 
 #endif
